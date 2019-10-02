@@ -1,31 +1,25 @@
-#include <iostream>
+#ifndef BINARYTREE_HPP
+#define BINARYTREE_HPP
+#include <vector>
 #include <stack>
 #include <queue>
-#include <vector>
-template <typename T>
+template <typename T, typename BTNode>
 class BinaryTree 
 {
 protected:
-	struct BTNode
-	{
-		T data;
-		BTNode* parent;
-		BTNode* LChild;
-		BTNode* RChild;
-		BTNode(T data) :data(data) { parent = NULL; LChild = NULL; RChild = NULL; }
-	};
 	BTNode* root;
 public:
-	//ÈôµÚÒ»¸ö±éÀúĞòÁĞÎªÇ°Ğò±éÀúĞòÁĞ,ÔòtypeÓ¦Îª0;ÈôµÚÒ»¸ö±éÀúĞòÁĞÎªºóĞò±éÀúĞòÁĞ£¬ÔòtypeÓ¦ÎªÆäËûÕûÊı
-	//µÚ¶ş¸ö±éÀúĞòÁĞÊ¼ÖÕÎªÖĞĞò±éÀúĞòÁĞ
+	BinaryTree() { root = NULL; };
+	//è‹¥ç¬¬ä¸€ä¸ªéå†åºåˆ—ä¸ºå‰åºéå†åºåˆ—,åˆ™typeåº”ä¸º0;è‹¥ç¬¬ä¸€ä¸ªéå†åºåˆ—ä¸ºååºéå†åºåˆ—ï¼Œåˆ™typeåº”ä¸ºå…¶ä»–æ•´æ•°
+	//ç¬¬äºŒä¸ªéå†åºåˆ—å§‹ç»ˆä¸ºä¸­åºéå†åºåˆ—
 	BinaryTree(const std::vector<T> first_traversal, const std::vector<T> second_traversal, int type)
 	{
-		if(type == 0)
+		if (type == 0)
 			root = pre_in_construct(first_traversal, second_traversal);
 		else
 			root = post_in_construct(first_traversal, second_traversal);
 	}
-	//ÓÉÇ°Ğò±éÀúºÍÖĞĞò±éÀúĞòÁĞ¹¹Ôì¶ş²æÊ÷
+	//ç”±å‰åºéå†å’Œä¸­åºéå†åºåˆ—æ„é€ äºŒå‰æ ‘
 	BTNode* pre_in_construct(const std::vector<T> pre_traversal, const std::vector<T> in_traversal)
 	{
 		int len = pre_traversal.size();
@@ -34,9 +28,9 @@ public:
 		T sub_root_data = pre_traversal[0];
 		BTNode* sub_root = new BTNode(sub_root_data);
 		int i;
-		for (i = 0; ; i++) 
+		for (i = 0; ; i++)
 		{
-			if (in_traversal[i] == sub_root->data) 
+			if (in_traversal[i] == sub_root->data)
 			{
 				break;
 			}
@@ -46,12 +40,12 @@ public:
 		std::vector<T> right_in_traversal(len - i - 1);
 		std::vector<T> right_pre_traversal(len - i - 1);
 		int j;
-		for (j = 0; j < i; j++) 
+		for (j = 0; j < i; j++)
 		{
 			left_in_traversal[j] = in_traversal[j];
 			left_pre_traversal[j] = pre_traversal[j + 1];
 		}
-		for(j = i + 1; j < len; j++)
+		for (j = i + 1; j < len; j++)
 		{
 			right_in_traversal[j - i - 1] = in_traversal[j];
 			right_pre_traversal[j - i - 1] = pre_traversal[j];
@@ -60,13 +54,13 @@ public:
 		BTNode* RChild = pre_in_construct(right_pre_traversal, right_in_traversal);
 		sub_root->LChild = LChild;
 		sub_root->RChild = RChild;
-		if(LChild != NULL)
+		if (LChild != NULL)
 			LChild->parent = sub_root;
-		if(RChild != NULL)
+		if (RChild != NULL)
 			RChild->parent = sub_root;
 		return sub_root;
 	}
-	//ÓÉºóĞò±éÀúºÍÖĞĞò±éÀúĞòÁĞ¹¹Ôì¶ş²æÊ÷
+	//ç”±ååºéå†å’Œä¸­åºéå†åºåˆ—æ„é€ äºŒå‰æ ‘
 	BTNode* post_in_construct(const std::vector<T> post_traversal, const std::vector<T> in_traversal)
 	{
 		int len = post_traversal.size();
@@ -99,15 +93,15 @@ public:
 		BTNode* RChild = post_in_construct(right_post_traversal, right_in_traversal);
 		sub_root->LChild = LChild;
 		sub_root->RChild = RChild;
-		if(LChild != NULL)
+		if (LChild != NULL)
 			LChild->parent = sub_root;
-		if(RChild != NULL)
+		if (RChild != NULL)
 			RChild->parent = sub_root;
 		return sub_root;
 	}
 	typedef void(*fun)(BTNode*);
-	//Ç°Ğò±éÀú
-	void pre_traversal(fun visit) 
+	//å‰åºéå†
+	void pre_traversal(fun visit)
 	{
 		std::stack<BTNode*> node_container;
 		BTNode* cnt_node = root;
@@ -125,8 +119,8 @@ public:
 			node_container.pop();
 		}
 	}
-	//ÖĞĞò±éÀú
-	void in_traversal(fun visit) 
+	//ä¸­åºéå†
+	virtual void in_traversal(fun visit)
 	{
 		std::stack<BTNode*> node_container;
 		BTNode* cnt_node = root;
@@ -148,8 +142,8 @@ public:
 				break;
 		}
 	}
-	//ºóĞò±éÀú_·½·¨1
-	void post_traversal(fun visit) 
+	//ååºéå†_æ–¹æ³•1
+	void post_traversal(fun visit)
 	{
 		std::stack<BTNode*> node_container;
 		BTNode* cnt_node = root;
@@ -157,14 +151,14 @@ public:
 			node_container.push(cnt_node);
 		while (!node_container.empty())
 		{
-			//Ã¿´Î²Ù×÷½«0µ½×î¸ß×ó²à¿É¼ûÒ¶½Úµã(¼´ºóĞø±éÀúÊ×ÏÈ·ÃÎÊµÄ½áµã)(´Ë½ÚµãÓĞ¿ÉÄÜÎª×óº¢×Ó£¬Ò²¿ÉÄÜÎªÓÒº¢×Ó)ÍÆÈëÕ»
-			//´ËÊ±Ê£Óà²¿·ÖÎªÒÔÓë×î¸ß×ó²àÒ¶½Úµã×æÏÈÍ¬²ãµÄÓÒ½ÚµãÎª¸ùµÄÊ÷(³ı¸Ã½Úµã×ÔÉí)(Âú×ãÌõ¼şµÄ×î½ü×æÏÈ),Ê£Óà²¿·ÖÖØ¸´²Ù×÷,Ö±µ½Ê£Óà²¿·ÖÎª¿Õ¼¯
-			//³ı¸ù½ÚµãÍâ,Èç¹ûÕ»¶¥ÔªËØ²»Îªµ±Ç°½ÚµãµÄ¸¸½Úµã£¬Ò»¶¨Îªµ±Ç°½ÚµãµÄÓÒĞÖµÚ
-			//¸ù½ÚµãµÄ²Ù×÷Óë´ËÏàÍ¬
+			//æ¯æ¬¡æ“ä½œå°†0åˆ°æœ€é«˜å·¦ä¾§å¯è§å¶èŠ‚ç‚¹(å³åç»­éå†é¦–å…ˆè®¿é—®çš„ç»“ç‚¹)(æ­¤èŠ‚ç‚¹æœ‰å¯èƒ½ä¸ºå·¦å­©å­ï¼Œä¹Ÿå¯èƒ½ä¸ºå³å­©å­)æ¨å…¥æ ˆ
+			//æ­¤æ—¶å‰©ä½™éƒ¨åˆ†ä¸ºä»¥ä¸æœ€é«˜å·¦ä¾§å¶èŠ‚ç‚¹ç¥–å…ˆåŒå±‚çš„å³èŠ‚ç‚¹ä¸ºæ ¹çš„æ ‘(é™¤è¯¥èŠ‚ç‚¹è‡ªèº«)(æ»¡è¶³æ¡ä»¶çš„æœ€è¿‘ç¥–å…ˆ),å‰©ä½™éƒ¨åˆ†é‡å¤æ“ä½œ,ç›´åˆ°å‰©ä½™éƒ¨åˆ†ä¸ºç©ºé›†
+			//é™¤æ ¹èŠ‚ç‚¹å¤–,å¦‚æœæ ˆé¡¶å…ƒç´ ä¸ä¸ºå½“å‰èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹ï¼Œä¸€å®šä¸ºå½“å‰èŠ‚ç‚¹çš„å³å…„ç¬¬
+			//æ ¹èŠ‚ç‚¹çš„æ“ä½œä¸æ­¤ç›¸åŒ
 			if (node_container.top() != cnt_node->parent)
 			{
 				BTNode* x;
-				while (x = node_container.top()) 
+				while (x = node_container.top())
 				{
 					if (x->LChild)
 					{
@@ -182,8 +176,8 @@ public:
 			visit(cnt_node);
 		}
 	}
-	//ºóĞò±éÀú_·½·¨2
-	//¿¼ÂÇºóĞò±éÀúĞòÁĞµÄ·´Ğò×Ö·û´®
+	//ååºéå†_æ–¹æ³•2
+	//è€ƒè™‘ååºéå†åºåˆ—çš„ååºå­—ç¬¦ä¸²
 	void _post_traversal(fun visit)
 	{
 		std::stack<BTNode*> turn;
@@ -208,7 +202,7 @@ public:
 			turn.pop();
 		}
 	}
-	//²ã´Î±éÀú
+	//å±‚æ¬¡éå†
 	void level_traversal(fun visit)
 	{
 		std::queue<BTNode*> node_container;
@@ -230,11 +224,11 @@ public:
 	{
 		std::cout << node->data << ",";
 	}
-	~BinaryTree() 
+	~BinaryTree()
 	{
 		init(root);
 	}
-	void init(BTNode* root) 
+	void init(BTNode* root)
 	{
 		BTNode* LC = root->LChild;
 		BTNode* RC = root->RChild;
@@ -245,24 +239,4 @@ public:
 		delete root;
 	}
 };
-/*
-int main()
-{
-	std::vector<int> pre_traversal = { 1, 2, 4, 7, 5, 3, 6, 8 };
-	std::vector<int> in_traversal =  { 7, 4, 2, 5, 1, 8, 6, 3 };
-	
-	BinaryTree<int> bin_tree(pre_traversal, in_traversal, 0);
-
-	bin_tree.level_traversal(&(BinaryTree<int>::visit));
-	std::cout << std::endl;
-	bin_tree.pre_traversal(&(BinaryTree<int>::visit));
-	std::cout << std::endl;
-	bin_tree.in_traversal(&(BinaryTree<int>::visit));
-	std::cout << std::endl;
-	bin_tree.post_traversal(&(BinaryTree<int>::visit));
-	std::cout << std::endl;
-	bin_tree._post_traversal(&(BinaryTree<int>::visit));
-	std::cout << std::endl;
-	return 0;
-}
-*/
+#endif
