@@ -1,16 +1,17 @@
-#define Parent(i) ((i - 1) >> 1) //iµÄ¸¸Ç×
-#define LChild(i) (1 + (( i ) << 1))//iµÄ×ó¶ù×Ó
-#define RChild(i) ((1 + ( i )) << 1)//iµÄÓÒ¶ù×Ó
-#define InHeap(n, i) (((-1) < ( i )) &&(( i ) < ( n )))
-#define LChildValid(n, i) InHeap(n, LChild( i ))//iÊÇ·ñÓĞ×ó¶ù×Ó
-#define RChildValid(n, i) InHeap(n, RChild( i ))//iÊÇ·ñÓĞÓÒ¶ù×Ó
-#define Smaller(HC, i, j) ((HC[i] > HC[j]) ? j : i)
+#define Parent(i) ((i - 1) >> 1) //içš„çˆ¶äº²
+#define LChild(i) (1 + (( i ) << 1))//içš„å·¦å„¿å­
+#define RChild(i) ((1 + ( i )) << 1)//içš„å³å„¿å­
+#define InHeap(n, i) (((-1) < ( i )) && (( i ) < ( n )))
+#define LChildValid(n, i) InHeap(n, LChild( i ))
+#define RChildValid(n, i) InHeap(n, RChild( i ))
+#define Smaller(HC, i, j) (cmp(HC[i] , HC[j]) ? i : j)
 #define ProperParent(HC, n, i)\
 			(RChildValid(n, i) ? Smaller(HC, Smaller(HC, i, LChild(i)), RChild(i)) : \
 			(LChildValid(n, i) ? Smaller(HC, i, LChild(i)) : i)\
 			)
 #define DEFAULT_CAPACITY 100
 #include <iostream>
+#include <vector>
 template <typename T>
 class heap
 {
@@ -18,6 +19,7 @@ protected:
 	T* heapChain;
 	int _size;
 	int _capacity;
+	bool(*cmp)(T, T);
 public:
 	heap()
 	{
@@ -25,12 +27,23 @@ public:
 		heapChain = new T[_capacity];
 		_size = 0;
 	}
-	heap(T* e, int lo, int hi)
+	heap(T* e, int lo, int hi, void(*cmp)(T, T))
 	{
 		_capacity = DEFAULT_CAPACITY;
 		heapChain = new T[_capacity];
 		_size = 0;
+		this->cmp = cmp;
 		for (int i = lo; i < hi; i++)
+			insert(e[i]);
+	}
+	heap(std::vector<T> e, bool(*cmp)(T, T))
+	{
+		_capacity = DEFAULT_CAPACITY;
+		heapChain = new T[_capacity];
+		_size = 0;
+		this->cmp = cmp;
+		int len = e.size();
+		for (int i = 0; i < len; i++)
 			insert(e[i]);
 	}
 	void insert(T e)
@@ -38,7 +51,7 @@ public:
 		expand();
 		int i = _size;
 		heapChain[_size++] = e;
-		while ((i > 0) && (heapChain[Parent(i)] > heapChain[i]))
+		while ((i > 0) && !cmp(heapChain[Parent(i)], heapChain[i]))
 		{
 			std::swap(heapChain[Parent(i)], heapChain[i]);
 			i = Parent(i);
@@ -46,24 +59,24 @@ public:
 	}
 	void expand()
 	{
-		//¿Õ¼ä²»×ãÊ±£¬½«ÈİÁ¿À©ÎªÔ­À´µÄ2±¶
+		//ç©ºé—´ä¸è¶³æ—¶ï¼Œå°†å®¹é‡æ‰©ä¸ºåŸæ¥çš„2å€
 		if (_size < _capacity)
 			return;
 		T* oldHeapChain = heapChain;
 		heapChain = new T[_capacity << 1];
-		for (int i = 0; i < _size; i++) 
+		for (int i = 0; i < _size; i++)
 			heapChain[i] = oldHeapChain[i];
 		delete[] oldHeapChain;
 	}
-	T delMin()//É¾³ı¶Ñ¶¥ÔªËØ
+	T delMin()//åˆ é™¤å †é¡¶å…ƒç´ 
 	{
-		if (_size <= 0) 
+		if (_size <= 0)
 			return NULL;
 		T e = heapChain[0];
 		heapChain[0] = heapChain[--_size];
 		int n = _size;
 		int i = 0, j;
-		while (i != (j = ProperParent(heapChain, n, i))) 
+		while (i != (j = ProperParent(heapChain, n, i)))
 		{
 			std::swap(heapChain[i], heapChain[j]);
 			i = j;
@@ -81,7 +94,7 @@ public:
 		int i = rank, j;
 		if (i == ProperParent(heapChain, n, i))
 		{
-			while ((i > 0) && (heapChain[Parent(i)] > heapChain[i]))
+			while ((i > 0) && !cmp(heapChain[Parent(i)] , heapChain[i]))
 			{
 				std::swap(heapChain[Parent(i)], heapChain[i]);
 				i = Parent(i);
@@ -100,7 +113,7 @@ public:
 	}
 	void shrink()
 	{
-		//ÓĞĞ§¿Õ¼ä²»×ã25%Ê±£¬½«ÈİÁ¿ËõĞ¡ÎªÔ­À´µÄ50%
+		//æœ‰æ•ˆç©ºé—´ä¸è¶³25%æ—¶ï¼Œå°†å®¹é‡ç¼©å°ä¸ºåŸæ¥çš„50%
 		if (_size << 2 >= _capacity)
 			return;
 		T* oldHeapChain = heapChain;
@@ -115,22 +128,12 @@ public:
 			return NULL;
 		return heapChain[0];
 	}
+	friend void HuffmanTree(double* f, char* ch, int _size);
 };
 template <typename T>
-void heapSort(T* _elem, int lo, int hi) 
+void heapSort(T* _elem, int lo, int hi)
 {
 	heap<T> h(_elem, lo, hi);
 	for (int i = lo; i < hi; i++)
 		_elem[i] = h.delMin();
 }
-/*
-int main()
-{
-	int a[13] = { 3, 3, 1, 6, 10, 2, 42, 51, -1, -10, 100, -53, -7};
-	heapSort(a, 0, 13);
-	for (int i = 0; i < 10; i++) {
-		std::cout << a[i] << " ";
-	}
-	return 0;
-}
-*/
