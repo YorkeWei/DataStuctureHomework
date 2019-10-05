@@ -11,19 +11,19 @@ public:
 		for (int i = 0; i < _size; i++)
 			insert(_sequence[i]);
 	}
-	virtual BSTNode* insert(const T data) 
-	{	
+	virtual BSTNode* insert(const T data)
+	{
 		if (this->root == NULL) {
 			this->root = new BSTNode(data);
 			return this->root;
 		}
 		BSTNode* cnt = this->root;
-		while (true) 
+		while (true)
 		{
 			if (data <= cnt->data)
 				if (cnt->LChild)
 					cnt = cnt->LChild;
-				else 
+				else
 				{
 					cnt->LChild = new BSTNode(data);
 					cnt->LChild->parent = cnt;
@@ -32,7 +32,7 @@ public:
 			else
 				if (cnt->RChild)
 					cnt = cnt->RChild;
-				else 
+				else
 				{
 					cnt->RChild = new BSTNode(data);
 					cnt->RChild->parent = cnt;
@@ -54,7 +54,7 @@ public:
 		}
 		return NULL;
 	}
-	virtual bool remove(const T& e) 
+	virtual bool remove(const T& e)
 	{
 		BSTNode* posi = search(e);
 		if (!posi)
@@ -68,11 +68,13 @@ public:
 		BSTNode* u = NULL;
 		if ((!posi->LChild) && (!posi->RChild))
 		{
-			(posi->parent->LChild == posi) ? posi->parent->LChild = NULL : posi->parent->RChild = NULL;
 			u = posi->parent;
+			if (u)
+				(u->LChild == posi) ? u->LChild = NULL : u->RChild = NULL;
+			if (posi == this->root)
+				this->root = NULL;
 			delete posi;
 			return u;
-			
 		}
 		else if (!posi->LChild)
 		{
@@ -80,27 +82,23 @@ public:
 			u = posi->parent;
 			if (u)
 				(u->LChild == posi) ? (u->LChild = succ) : (u->RChild = succ);
-			if (succ)
-				succ->parent = u;
+			succ->parent = u;
+			if (posi == this->root)
+				this->root = succ;
 			delete posi;
-			if (succ)
-				return succ;
-			else
-				return u;
+			return succ;
 		}
 		else if (!posi->RChild)
 		{
 			succ = posi->LChild;
 			u = posi->parent;
 			if (u)
-				(u->LChild == posi) ? (u->LChild = succ) : ( u->RChild = succ);
-			if (succ)
-				succ->parent = u;
+				(u->LChild == posi) ? (u->LChild = succ) : (u->RChild = succ);
+			succ->parent = u;
+			if (posi == this->root)
+				this->root = succ;
 			delete posi;
-			if (succ)
-				return succ;
-			else
-				return u;
+			return succ;
 		}
 		else
 		{
@@ -118,7 +116,7 @@ public:
 			else
 				return u;
 		}
-		
+
 	}
 	BSTNode* succ(BSTNode* node)//返回node在中序遍历中的后续节点
 	{
@@ -155,7 +153,7 @@ public:
 				cnt_node = node_container.top();
 				node_container.pop();
 				count++;
-				if (count >= k) 
+				if (count >= k)
 					return cnt_node->data;
 				cnt_node = cnt_node->RChild;
 			}
