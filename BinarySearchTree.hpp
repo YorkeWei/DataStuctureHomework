@@ -62,7 +62,7 @@ public:
 		removeAt(posi);
 		return true;
 	}
-	BSTNode* removeAt(BSTNode* posi)//·µ»Øºó¼ÌÕßµÄÖ¸Õë
+	BSTNode* removeAt(BSTNode* posi)//è¿”å›åç»§è€…çš„æŒ‡é’ˆ
 	{
 		BSTNode* succ = NULL;
 		BSTNode* u = NULL;
@@ -83,7 +83,10 @@ public:
 			if (succ)
 				succ->parent = u;
 			delete posi;
-			return succ;
+			if (succ)
+				return succ;
+			else
+				return u;
 		}
 		else if (!posi->RChild)
 		{
@@ -94,11 +97,14 @@ public:
 			if (succ)
 				succ->parent = u;
 			delete posi;
-			return succ;
+			if (succ)
+				return succ;
+			else
+				return u;
 		}
 		else
 		{
-			BSTNode* w = this->succ(posi);//Êµ¼Ê±»É¾³ıµÄ½Úµã
+			BSTNode* w = this->succ(posi);//å®é™…è¢«åˆ é™¤çš„èŠ‚ç‚¹
 			std::swap(w->data, posi->data);
 			succ = w->RChild;
 			u = w->parent;
@@ -110,11 +116,11 @@ public:
 			if (succ)
 				return succ;
 			else
-				return succ->parent;
+				return u;
 		}
 		
 	}
-	BSTNode* succ(BSTNode* node)//·µ»ØnodeÔÚÖĞĞò±éÀúÖĞµÄºóĞø½Úµã
+	BSTNode* succ(BSTNode* node)//è¿”å›nodeåœ¨ä¸­åºéå†ä¸­çš„åç»­èŠ‚ç‚¹
 	{
 		BSTNode* s = node;
 		if (node->RChild)
@@ -131,7 +137,7 @@ public:
 		}
 		return s;
 	}
-	//ÕÒ´ÓĞ¡µ½´óµÚk¸öÔªËØ
+	//æ‰¾ä»å°åˆ°å¤§ç¬¬kä¸ªå…ƒç´ 
 	T find_rank_k(int k)
 	{
 		std::stack<BSTNode*> node_container;
