@@ -16,8 +16,8 @@ struct Graph
 {
 	std::vector<Node> myNodeList;
 	std::map<int, std::map<int, double>> Edges;
-	Graph(int node_num, std::vector<int> first, std::vector<int> second, std::vector<double> weight)
-	//µÚÒ»¸ö²ÎÊıÎª½áµãÊıÁ¿£¬µÚ¶ş¸ö²ÎÊıÎª±ßµÄ¶Ëµã¼¯ºÏ£¬µÚÈı¸ö²ÎÊıÎª±ßµÄÁíÒ»¸ö¶Ëµã¼¯ºÏ£¬µÚËÄ¸ö²ÎÊıÎª±ßµÄÈ¨Öµ¼¯ºÏ£¬¶ş¡¢Èı¡¢ËÄÉÏÓĞ¶ÔÓ¦¹ØÏµ
+	Graph(int node_num, const std::vector<int>& first, const std::vector<int>& second, const std::vector<double>& weight)
+	//ç¬¬ä¸€ä¸ªå‚æ•°ä¸ºç»“ç‚¹æ•°é‡ï¼Œç¬¬äºŒä¸ªå‚æ•°ä¸ºè¾¹çš„ç«¯ç‚¹é›†åˆï¼Œç¬¬ä¸‰ä¸ªå‚æ•°ä¸ºè¾¹çš„å¦ä¸€ä¸ªç«¯ç‚¹é›†åˆï¼Œç¬¬å››ä¸ªå‚æ•°ä¸ºè¾¹çš„æƒå€¼é›†åˆï¼ŒäºŒã€ä¸‰ã€å››ä¸Šæœ‰å¯¹åº”å…³ç³»
 	{
 		int i;
 		for (i = 0; i < node_num; i++) 
@@ -26,11 +26,8 @@ struct Graph
 		for (i = len - 1; i >= 0; i--) 
 		{
 			int a = first[i];
-			first.pop_back();
 			int b = second[i];
-			second.pop_back();
 			double w = weight[i];
-			weight.pop_back();
 			Edges[a][b] = w;
 			Edges[b][a] = w;
 		}
@@ -48,11 +45,11 @@ public:
 		int len = g->myNodeList.size();
 		info.resize(len);
 	}
-	std::vector<std::pair<double, int>> getInfo()
+	const std::vector<std::pair<double, int>>& getInfo()
 	{
 		return this->info;
 	}
-	void Run(int source)//²ÎÊıÎªÔ´µã
+	void Run(int source)//å‚æ•°ä¸ºæºç‚¹
 	{ 
 		struct Event
 		{
@@ -86,7 +83,7 @@ public:
 				double dis = top_evt.dis;
 				int parent = top_evt.parent;
 				info[self_id] = std::make_pair(dis, parent);
-				std::map<int, double> self_edge = g->Edges[self_id];
+				std::map<int, double>& self_edge = g->Edges[self_id];
 				std::map<int, double>::iterator it = self_edge.begin();
 				for (; it != self_edge.end(); ++it) 
 				{
@@ -122,7 +119,7 @@ int main()
 	Graph g(node_num, first, second, weight);
 	Dijkstra dij(&g);
 	dij.Run(source);
-	std::vector<std::pair<double, int>> res = dij.getInfo();
+	const std::vector<std::pair<double, int>>& res = dij.getInfo();
 	int len = res.size();
 	for (int i = 0; i < len; i++) 
 	{
@@ -133,15 +130,15 @@ int main()
 			path.push(cnt);
 			cnt = res[cnt].second;
 		}
-		std::cout << "½áµã:" << i << std::endl;
-		std::cout << "×î¶ÌÂ·¾¶:";
+		std::cout << "ç»“ç‚¹:" << i << std::endl;
+		std::cout << "æœ€çŸ­è·¯å¾„:";
 		while (!path.empty())
 		{
 			std::cout << path.top() << "->";
 			path.pop();
 		}
 		std::cout << std::endl;
-		std::cout << "×î¶ÌÂ·¾¶³¤¶È:" << res[i].first << std::endl;
+		std::cout << "æœ€çŸ­è·¯å¾„é•¿åº¦:" << res[i].first << std::endl;
 	}
 	return 0;
 }
